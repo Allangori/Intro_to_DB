@@ -1,82 +1,45 @@
-import mysql.connector
-from mysql.connector import Error
+-- task_2.sql
 
+CREATE TABLE authors (
+    author_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    biography TEXT,
+    birth_date DATE
+);
 
-def create_tables(connection):
-    tables = {
-        "authors": """
-            CREATE TABLE IF NOT EXISTS authors (
-                author_id INT PRIMARY KEY AUTO_INCREMENT,
-                author_name VARCHAR(215) NOT NULL
-            );
-        """,
-        "books": """
-            CREATE TABLE IF NOT EXISTS books (
-                book_id INT PRIMARY KEY AUTO_INCREMENT,
-                title VARCHAR(130) NOT NULL,
-                author_id INT,
-                price DOUBLE,
-                publication_date DATE,
-                FOREIGN KEY (author_id) REFERENCES authors(author_id)
-            );
-        """,
-        "customers": """
-            CREATE TABLE IF NOT EXISTS customers (
-                customer_id INT PRIMARY KEY AUTO_INCREMENT,
-                customer_name VARCHAR(215) NOT NULL,
-                email VARCHAR(215) UNIQUE NOT NULL,
-                address TEXT
-            );
-        """,
-        "orders": """
-            CREATE TABLE IF NOT EXISTS orders (
-                order_id INT PRIMARY KEY AUTO_INCREMENT,
-                customer_id INT,
-                order_date DATE,
-                FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
-            );
-        """,
-        "order_details": """
-            CREATE TABLE IF NOT EXISTS order_details (
-                orderdetailid INT PRIMARY KEY AUTO_INCREMENT,
-                order_id INT,
-                book_id INT,
-                quantity DOUBLE,
-                FOREIGN KEY (order_id) REFERENCES orders(order_id),
-                FOREIGN KEY (book_id) REFERENCES books(book_id)
-            );
-        """
-    }
+CREATE TABLE books (
+    book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author_id INT,
+    genre VARCHAR(100),
+    published_date DATE,
+    price DECIMAL(10, 2),
+    stock INT,
+    FOREIGN KEY (author_id) REFERENCES authors(author_id)
+);
 
-    cursor = connection.cursor()
+CREATE TABLE customers (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    address TEXT
+);
 
-    for table_name, create_table_query in tables.items():
-        try:
-            cursor.execute(create_table_query)
-            print(f"Table '{table_name}' created successfully.")
-        except Error as e:
-            print(f"Error creating table '{table_name}':", e)
+CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT,
+    order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(50),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
 
-    cursor.close()
-
-try:
-    connection = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Daisy20)",
-        database="alx_book_store"
-    )
-
-    if connection.is_connected():
-        print("Connected to the alx_book_store database.")
-        
-        
-        create_tables(connection)
-        connection.commit()  
-except Error as e:
-    print("Error while connecting to MySQL:", e)
-
-finally:
-    if 'connection' in locals() and connection.is_connected():
-        connection.close()
-    print("MySQL connection is closed.")
+CREATE TABLE order_details (
+    order_detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    book_id INT,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (book_id) REFERENCES books(book_id)
+);
