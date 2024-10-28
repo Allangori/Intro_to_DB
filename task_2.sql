@@ -36,7 +36,7 @@ CREATE TABLE Order_details (
     order_detail_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT,
     book_id INT,
-    quantity INT NOT NULL,
+    quantity DOUBLE,
     price DECIMAL(10, 2),
     FOREIGN KEY (order_id) REFERENCES Orders(order_id),
     FOREIGN KEY (book_id) REFERENCES Books(book_id)
